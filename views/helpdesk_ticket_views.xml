@@ -4,6 +4,20 @@
         <field name="model">helpdesk.ticket</field>
         <field name="inherit_id" ref="helpdesk_mgmt.ticket_view_form"/>
         <field name="arch" type="xml">
+             <!-- Insertar el Smart Button en el header -->
+            <xpath expr="//header" position="inside">
+                <field name="invoice_ids" invisible="1"/>
+                <button name="%(account.action_move_out_invoice_type)d"
+                        type="action" 
+                        string="Facturas" 
+                        icon="fa-money" 
+                        attrs="{'invisible': [('invoice_ids', '=', False)]}"
+                        context="{'search_default_ticket_id': active_id}"
+                        class="oe_stat_button">
+                    <field name="invoice_ids" widget="statinfo" string="Facturas"/>
+                </button>
+            </xpath>
+
             <xpath expr="//notebook" position="inside">
                 <page string="Horas dedicadas">
                     <field name="timesheet_ids">
@@ -12,19 +26,11 @@
                             <field name="name"/>
                             <field name="account_id"/>
                             <field name="product_id" domain="[('company_id', 'in', [company_id, False])]"/>
-                            <field name="unit_amount"/>
+                            <field name="unit_amount" attrs="{'readonly': [('invoiced', '=', True)]}"/>
+                            <field name="invoiced"/>
                             <field name="date"/>
                         </tree>
-                        <form string="Detalle de horas dedicadas">
-                            <group>
-                                <field name="name"/>
-                                <field name="company_id" invisible="1"/>
-                                <field name="product_id" domain="[('company_id', 'in', [company_id, False])]"/>
-                                <field name="unit_amount"/>
-                                <field name="date"/>
-                            </group>
-                        </form>
-                    </field>
+                     </field>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_invoice_ticket" type="object" string="Facturar horas" class="btn-primary"/>
                     </div>

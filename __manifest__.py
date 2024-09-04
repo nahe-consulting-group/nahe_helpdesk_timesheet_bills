@@ -8,12 +8,13 @@
     "website": "https://nahe.com.ar/",
     "license": "AGPL-3",
     "category": "Technical Settings",
-    "version": "16.0.2.1.0",
+    "version": "16.0.7.5.0",
     "development_status": "Production/Stable",
     "application": False,
     "installable": True,
-    "depends": ["helpdesk_mgmt", "sale", "hr_timesheet"],
+    "depends": ["account", "helpdesk_mgmt", "sale", "hr_timesheet"],
     "data": [
         "views/helpdesk_ticket_views.xml",
+        "views/account_move_views.xml",
     ],
 }

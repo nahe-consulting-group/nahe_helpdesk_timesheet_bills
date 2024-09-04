@@ -11,6 +11,16 @@ class HelpdeskTicket(models.Model):
     total_hours = fields.Float(
         string="Total de horas", compute="_compute_total_hours", store=True
     )
+    invoice_ids = fields.Many2many(
+        "account.move", string="Facturas", compute="_compute_invoice_ids", store=False
+    )
+
+    @api.depends("timesheet_ids")
+    def _compute_invoice_ids(self):
+        for ticket in self:
+            # Buscar las facturas relacionadas con el ticket a través de ticket_id en account.move
+            invoices = self.env["account.move"].search([("ticket_id", "=", ticket.id)])
+            ticket.invoice_ids = invoices if invoices else False
 
     @api.depends("timesheet_ids.unit_amount")
     def _compute_total_hours(self):
@@ -19,10 +29,15 @@ class HelpdeskTicket(models.Model):
 
     def action_invoice_ticket(self):
         self.ensure_one()
-        if not self.timesheet_ids:
-            raise UserError("No hay horas registradas para facturar.")
+
+        # Filtrar las líneas que no han sido facturadas
+        non_invoiced_lines = self.timesheet_ids.filtered(lambda l: not l.invoiced)
+
+        if not non_invoiced_lines:
+            raise UserError("No hay horas sin facturar para este ticket.")
+
         invoice_lines = []
-        for line in self.timesheet_ids:
+        for line in non_invoiced_lines:
             invoice_lines.append(
                 (
                     0,
@@ -35,13 +50,17 @@ class HelpdeskTicket(models.Model):
                     },
                 )
             )
+            line.invoiced = True  # Marcar la línea como facturada
+
         invoice = self.env["account.move"].create(
             {
                 "partner_id": self.partner_id.id,
                 "move_type": "out_invoice",
                 "invoice_line_ids": invoice_lines,
+                "ticket_id": self.id,  # Guardar el ID del ticket en la factura
             }
         )
+
         return {
             "type": "ir.actions.act_window",
             "name": "Factura",
