@@ -8,7 +8,7 @@
     "website": "https://nahe.com.ar/",
     "license": "AGPL-3",
     "category": "Technical Settings",
-    "version": "16.0.7.5.0",
+    "version": "16.0.7.6.0",
     "development_status": "Production/Stable",
     "application": False,
     "installable": True,
@@ -16,5 +16,6 @@
     "data": [
         "views/helpdesk_ticket_views.xml",
         "views/account_move_views.xml",
+        "views/account_move_filter_inherit.xml",
     ],
 }
