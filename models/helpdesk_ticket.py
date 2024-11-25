@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+from datetime import date
 
 
 class HelpdeskTicket(models.Model):
@@ -58,6 +59,9 @@ class HelpdeskTicket(models.Model):
                 "move_type": "out_invoice",
                 "invoice_line_ids": invoice_lines,
                 "ticket_id": self.id,  # Guardar el ID del ticket en la factura
+                "invoice_date": date.today(),  # Fecha de inicio por defecto
+                "l10n_ar_afip_service_start": date.today(),  # Fecha de inicio por defecto
+                "l10n_ar_afip_service_end": date.today(),  # Fecha de fin por defecto
             }
         )
 
